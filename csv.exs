@@ -11,24 +11,26 @@ defmodule CSV do
   defp process([]), do: []
   defp process([headers | rest]) do
     headers = process_headers(headers)
-    rest = Enum.map(rest, &cells/1)
 
-    Enum.map(rest, &Enum.zip(headers, &1))
+    Enum.map(rest, &cells(headers, &1))
   end
 
-  defp process_headers(headers) do
-    headers
-    |> String.split(",")
+  defp process_headers(string) do
+    string
+    |> split_cells
     |> Enum.map(&String.to_atom/1)
   end
 
-  defp cells(string) do
-    string
-    |> String.split(",")
-    |> Enum.map(&toFloat/1)
+  defp cells(headers, string) do
+    cells = string
+    |> split_cells
+    |> Enum.map(&to_float/1)
+
+    Enum.zip(headers, cells)
   end
 
-  defp toFloat(word) do
+  defp split_cells(string), do: String.split(string, ",")
+  defp to_float(word) do
     case Float.parse(word) do
       {float, ""} -> float
       _ -> word
